@@ -1,7 +1,7 @@
 /*
  * Mengimpor React dan hooks untuk mengelola state dan siklus hidup komponen
  */
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 
 /*
  * Mengimpor komponen UI dasar dari React Native untuk menyusun tampilan form
@@ -31,7 +31,7 @@ import apiClient from '../api/config';
  * Props 'route' dipakai untuk menerima data yang dilempar dari layar sebelumnya (contohnya ID Produk).
  * Props 'navigation' dipakai untuk kembali atau berpindah ke layar lain.
  */
-const AddEditProductScreen = ({ route, navigation }) => {
+const AddEditProductScreen = ({route, navigation}) => {
     /*
      * Membuat state 'product' berupa objek yang menyimpan data-data dari inputan form
      */
@@ -45,7 +45,7 @@ const AddEditProductScreen = ({ route, navigation }) => {
 
     // Menyimpan URL sementara (URI) gambar baru yang dipilih dari galeri perangkat
     const [imageUri, setImageUri] = useState(null);
-    
+
     // Menyimpan URL gambar asli dari server saat kita sedang dalam mode edit (gambar lama)
     const [existingImageUrl, setExistingImageUrl] = useState(null);
 
@@ -146,12 +146,12 @@ const AddEditProductScreen = ({ route, navigation }) => {
 
                 // Gunakan POST (PHP biasanya lebih mudah menerima file lewat POST)
                 await apiClient.post('/products.php', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
+                    headers: {'Content-Type': 'multipart/form-data'},
                 });
             } else {
                 // CREATE / TAMBAH BARU
                 await apiClient.post('/products.php', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
+                    headers: {'Content-Type': 'multipart/form-data'},
                 });
             }
 
@@ -173,7 +173,7 @@ const AddEditProductScreen = ({ route, navigation }) => {
                 placeholder="Nama Produk"
                 style={styles.input}
                 value={product.name}
-                onChangeText={text => setProduct({ ...product, name: text })}
+                onChangeText={text => setProduct({...product, name: text})}
             />
 
             <TextInput
@@ -181,7 +181,7 @@ const AddEditProductScreen = ({ route, navigation }) => {
                 style={styles.input}
                 keyboardType="numeric"
                 value={product.price}
-                onChangeText={text => setProduct({ ...product, price: text })}
+                onChangeText={text => setProduct({...product, price: text})}
             />
 
             <TextInput
@@ -189,7 +189,7 @@ const AddEditProductScreen = ({ route, navigation }) => {
                 style={styles.input}
                 keyboardType="numeric"
                 value={product.stock}
-                onChangeText={text => setProduct({ ...product, stock: text })}
+                onChangeText={text => setProduct({...product, stock: text})}
             />
 
             <TextInput
@@ -197,29 +197,29 @@ const AddEditProductScreen = ({ route, navigation }) => {
                 style={styles.input}
                 value={product.category_id}
                 onChangeText={text =>
-                    setProduct({ ...product, category_id: text })
+                    setProduct({...product, category_id: text})
                 }
             />
 
-            <Button title="Pilih Gambar" onPress={handleChoosePhoto} />
+            <Button title="Pilih Gambar" onPress={handleChoosePhoto}/>
 
             {imageUri ? (
                 // Tampilkan gambar yang baru dipilih
-                <Image source={{ uri: imageUri }} style={styles.image} />
+                <Image source={{uri: imageUri}} style={styles.image}/>
             ) : (
                 // Jika tidak ada gambar baru, tampilkan gambar lama (jika ada)
                 existingImageUrl && (
                     <Image
-                        source={{ 
-                            uri: `http://10.200.205.16/${existingImageUrl}`,
-                            headers: { 'Host': 'api-project.local' }
+                        source={{
+                            uri: `http://10.25.210.16/${existingImageUrl}`,
+                            headers: {'Host': 'api-project.local'}
                         }}
                         style={styles.image}
                     />
                 )
             )}
 
-            <Button title="Simpan" onPress={handleSave} />
+            <Button title="Simpan" onPress={handleSave}/>
         </View>
     );
 };
@@ -227,7 +227,7 @@ const AddEditProductScreen = ({ route, navigation }) => {
 export default AddEditProductScreen;
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20 },
+    container: {flex: 1, padding: 20},
     input: {
         borderWidth: 1,
         marginBottom: 10,

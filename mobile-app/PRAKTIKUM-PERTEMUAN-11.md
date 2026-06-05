@@ -185,7 +185,7 @@ import apiClient from '../api/config';
 // [BARU] Import hook useCart dari Context
 import { useCart } from '../context/CartContext';
 
-const BASE_URL = 'http://10.200.205.16/'; // Sesuaikan dengan IP Server Anda
+const BASE_URL = 'http://10.25.210.16/'; // Sesuaikan dengan IP Server Anda
 
 const ProductListScreen = ({ navigation }) => {
     const [products, setProducts] = useState([]);

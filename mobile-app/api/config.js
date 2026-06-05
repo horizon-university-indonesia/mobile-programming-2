@@ -13,7 +13,7 @@ const apiClient = axios.create({
     // baseURL adalah alamat utama server API kita.
     // Pastikan IP ini sesuai dengan alamat IP server/backend Anda
     // ubuntu: hostname -I
-    baseURL: 'http://10.200.205.16/api',
+    baseURL: 'http://10.25.210.16/api',
 
     // headers mengatur informasi tambahan yang dikirim bersama setiap request
     headers: {

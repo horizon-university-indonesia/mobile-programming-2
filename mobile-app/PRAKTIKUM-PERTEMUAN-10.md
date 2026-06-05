@@ -149,7 +149,7 @@ import axios from 'axios';
 const apiClient = axios.create({
     // baseURL adalah alamat utama server API kita.
     // Pastikan IP ini sesuai dengan alamat IP server/backend Anda (Cek pakai hostname -I atau ipconfig)
-    baseURL: 'http://10.200.205.16/api',
+    baseURL: 'http://10.25.210.16/api',
     
     // headers mengatur informasi tambahan yang dikirim bersama setiap request
     headers: {
@@ -195,7 +195,7 @@ import {
  */
 import apiClient from '../api/config';
 
-const BASE_URL = 'http://10.200.205.16/'; // Sesuaikan dengan folder root project di HTDOCS
+const BASE_URL = 'http://10.25.210.16/'; // Sesuaikan dengan folder root project di HTDOCS
 
 /*
  * Komponen utama layar daftar produk
@@ -566,7 +566,7 @@ const AddEditProductScreen = ({ route, navigation }) => {
                 existingImageUrl && (
                     <Image
                         source={{ 
-                            uri: `http://10.200.205.16/${existingImageUrl}`,
+                            uri: `http://10.25.210.16/${existingImageUrl}`,
                             // Jika server menggunakan VirtualHost, tambahkan header Host:
                             headers: { 'Host': 'api-project.local' }
                         }}
@@ -684,7 +684,7 @@ Jika Anda tidak menggunakan HP asli, melainkan Emulator (Android Studio):
 ### Cara Cek IP Laptop (Windows):
 1.  Tekan tombol `Windows + R`, ketik `cmd`, lalu Enter.
 2.  Ketik `ipconfig` lalu Enter.
-3.  Lihat pada bagian **Wireless LAN adapter Wi-Fi**, cari baris **IPv4 Address**. Contoh: `10.200.205.16`.
+3.  Lihat pada bagian **Wireless LAN adapter Wi-Fi**, cari baris **IPv4 Address**. Contoh: `10.25.210.16`.
 
 ---
 

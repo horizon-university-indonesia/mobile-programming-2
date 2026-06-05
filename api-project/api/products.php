@@ -31,10 +31,66 @@ switch ($method) {
             $product = $stmt->fetch();
             echo json_encode($product ? $product : ["message" => "Product not found"]);
         } else {
-            // Get all products
-            $stmt = $pdo->query("SELECT * FROM products");
+            // Get all products with pagination, search, and filter (Modul 13)
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+            $search = isset($_GET['search']) ? $_GET['search'] : '';
+            $categoryId = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
+            $minPrice = isset($_GET['min_price']) ? (float)$_GET['min_price'] : 0;
+            $maxPrice = isset($_GET['max_price']) ? (float)$_GET['max_price'] : 999999999;
+            $offset = ($page - 1) * $limit;
+
+            $whereClauses = ["1=1"];
+            $params = [];
+            
+            if (!empty($search)) {
+                $whereClauses[] = "p.name LIKE :search";
+                $params[':search'] = "%$search%";
+            }
+            if ($categoryId) {
+                $whereClauses[] = "p.category_id = :category_id";
+                $params[':category_id'] = $categoryId;
+            }
+            
+            $whereClauses[] = "p.price BETWEEN :min_price AND :max_price";
+            $params[':min_price'] = $minPrice;
+            $params[':max_price'] = $maxPrice;
+            
+            $sqlWhere = implode(" AND ", $whereClauses);
+            
+            $query = "SELECT p.*, c.name as category_name 
+                      FROM products p
+                      LEFT JOIN categories c ON p.category_id = c.id
+                      WHERE {$sqlWhere}
+                      ORDER BY p.id DESC
+                      LIMIT :limit OFFSET :offset";
+            
+            $stmt = $pdo->prepare($query);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            $stmt->execute();
             $products = $stmt->fetchAll();
-            echo json_encode($products);
+            
+            $countQuery = "SELECT COUNT(*) as total FROM products p WHERE {$sqlWhere}";
+            $countStmt = $pdo->prepare($countQuery);
+            foreach ($params as $key => $value) {
+                $countStmt->bindValue($key, $value);
+            }
+            $countStmt->execute();
+            $totalProducts = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+            $totalPages = ceil($totalProducts / $limit);
+            
+            echo json_encode([
+                'data' => $products,
+                'pagination' => [
+                    'currentPage' => $page,
+                    'totalPages' => $totalPages,
+                    'totalProducts' => $totalProducts
+                ]
+            ]);
         }
         break;
 

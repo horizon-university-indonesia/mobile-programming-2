@@ -106,9 +106,12 @@ Sebelum menjalankan aplikasi, pastikan Anda telah menginstal software berikut:
 ## 📚 Materi Praktikum
 
 Berikut adalah rujukan materi praktikum yang tersedia dalam repositori ini:
-- [Praktikum Pertemuan 10](mobile-app/PRAKTIKUM-PERTEMUAN-10.md) - Implementasi CRUD & List View.
-- [Praktikum Pertemuan 11](mobile-app/PRAKTIKUM-PERTEMUAN-11.md) - Implementasi Keranjang Belanja & PDF Receipts.
-
+- [Praktikum Pertemuan 10](mobile-app/PRAKTIKUM-PERTEMUAN-10.md) - Implementasi CRUD & List View
+- [Praktikum Pertemuan 11](mobile-app/PRAKTIKUM-PERTEMUAN-11.md) - Implementasi Keranjang Belanja & PDF Receipts
+- [Praktikum Pertemuan 12](mobile-app/PRAKTIKUM-PERTEMUAN-12.md) - Implementasi CRUD & List View
+- [Praktikum Pertemuan 13](mobile-app/PRAKTIKUM-PERTEMUAN-13.md) - Project E-commerce – Product Catalog
+- [Praktikum Pertemuan 14](mobile-app/PRAKTIKUM-PERTEMUAN-14.md) - E-commerce Cart & Checkout
+- [Praktikum Pertemuan 15](mobile-app/PRAKTIKUM-PERTEMUAN-15.md) - Payment Integration & Microservices Architecture
 ---
 
 ## 💡 Troubleshooting

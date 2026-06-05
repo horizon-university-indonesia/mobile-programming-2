@@ -93,3 +93,6 @@ Sesuaikan URL gambar dan hapus header:
 3. **Apache Running**: Pastikan web server Apache (XAMPP/Laragon/Native) dalam status **Running**.
 
 ---
+
+> [!TIP]
+> **Tips Pro**: Di masa depan, Anda bisa memindahkan variabel IP ke satu file konstanta (misal: `api/constants.js`) agar Anda hanya perlu mengubah IP di satu tempat saja untuk seluruh aplikasi.

@@ -3,7 +3,7 @@
  * useState: untuk menyimpan data lokal di dalam komponen
  * useEffect: untuk menjalankan fungsi saat komponen dimuat atau state berubah
  */
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 
 /*
  * Mengimpor komponen-komponen dasar UI dari React Native
@@ -22,24 +22,24 @@ import {
  * Mengimpor konfigurasi axios yang sudah kita buat untuk melakukan pemanggilan API
  */
 import apiClient from '../api/config';
-import { useCart } from '../context/CartContext';
+import {useCart} from '../context/CartContext';
 
-const BASE_URL = 'http://10.200.205.16/'; // Sesuaikan dengan folder root project di HTDOCS
+const BASE_URL = 'http://10.25.210.16/'; // Sesuaikan dengan folder root project di HTDOCS
 
 /*
  * Komponen utama layar daftar produk
  * Menerima props 'navigation' untuk berpindah ke layar lain
  */
-const ProductListScreen = ({ navigation }) => {
+const ProductListScreen = ({navigation}) => {
     // Menyimpan daftar produk yang sedang ditampilkan
     const [products, setProducts] = useState([]);
-    
+
     // Memanggil fungsi addItem dan state items dari CartContext
-    const { addItem, items } = useCart();
-    
+    const {addItem, items} = useCart();
+
     // Menyimpan kata kunci pencarian yang diketik user
     const [search, setSearch] = useState('');
-    
+
     // Menyimpan data seluruh produk asli dari server sebagai acuan saat pencarian
     const [fullProductList, setFullProductList] = useState([]);
 
@@ -60,16 +60,30 @@ const ProductListScreen = ({ navigation }) => {
      */
     const fetchProducts = async () => {
         try {
-            const response = await apiClient.get('/products.php');
-            setProducts(response.data);
-            setFullProductList(response.data);
+            // Menambahkan parameter timestamp (_t) untuk mencegah caching response API oleh OS Android/iOS
+            const response = await apiClient.get('/products.php?_t=' + new Date().getTime());
+            setProducts(response.data.data);
+            setFullProductList(response.data.data);
         } catch (error) {
             console.log('Error fetch:', error);
         }
     };
 
+    const addToDatabaseCart = async (product) => {
+        try {
+            await apiClient.post('/cart.php', {
+                product_id: product.id,
+                quantity: 1
+            });
+            alert(`${product.name} berhasil ditambahkan ke keranjang!`);
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            alert('Gagal menambahkan ke keranjang');
+        }
+    };
+
     /*
-     * useEffect ini bereaksi setiap kali nilai 'search' berubah (user mengetik sesuatu).
+     * useEffect ini bereaksi setiap kali nilai 'search' atau 'fullProductList' berubah.
      * Fungsinya untuk menyaring (filter) daftar produk sesuai nama yang dicari.
      */
     useEffect(() => {
@@ -82,31 +96,35 @@ const ProductListScreen = ({ navigation }) => {
             );
             setProducts(filtered);
         }
-    }, [search]);
+    }, [search, fullProductList]);
 
     /*
      * renderItem berfungsi menentukan desain/tampilan dari setiap item produk 
      * di dalam daftar (FlatList)
      */
-    const renderItem = ({ item }) => {
+    const renderItem = ({item}) => {
         // Menentukan URL gambar produk. Jika tidak ada, pakai gambar placeholder.
-        const imageUri = item.image_url
-            ? `${BASE_URL}${item.image_url}`
-            : 'https://via.placeholder.com/80';
+        let imagePath = item.image_url;
+        // Jika path tidak mengandung '/', berarti itu cuma nama file lama (contoh: keripik.jpg)
+        if (imagePath && !imagePath.includes('/')) {
+            imagePath = 'uploads/products/' + imagePath;
+        }
 
-        console.log(`Image URI for ${item.name}:`, imageUri);
+        const imageUri = imagePath
+            ? `${BASE_URL}${imagePath}?t=${new Date().getTime()}`
+            : 'https://via.placeholder.com/80';
 
         return (
             <TouchableOpacity
                 style={styles.card}
                 onPress={() =>
-                    navigation.navigate('AddEditProduct', { productId: item.id })
+                    navigation.navigate('AddEditProduct', {productId: item.id})
                 }
             >
                 <Image
-                    source={{ 
+                    source={{
                         uri: imageUri,
-                        headers: { 'Host': 'api-project.local' }
+                        headers: {'Host': 'api-project.local'}
                     }}
                     style={styles.image}
                 />
@@ -115,9 +133,9 @@ const ProductListScreen = ({ navigation }) => {
                     <Text>Kategori: {item.category_name || '-'}</Text>
                     <Text>Harga: Rp {item.price}</Text>
                     <Text>Stok: {item.stock}</Text>
-                    <TouchableOpacity 
-                        style={styles.addToCartButton} 
-                        onPress={() => addItem(item)}
+                    <TouchableOpacity
+                        style={styles.addToCartButton}
+                        onPress={() => addToDatabaseCart(item)}
                     >
                         <Text style={styles.addToCartText}>+ Tambah Keranjang</Text>
                     </TouchableOpacity>
@@ -137,14 +155,14 @@ const ProductListScreen = ({ navigation }) => {
                     placeholder="Cari produk..."
                     value={search}
                     onChangeText={setSearch}
-                    style={[styles.search, { flex: 1, marginBottom: 0 }]}
+                    style={[styles.search, {flex: 1, marginBottom: 0}]}
                 />
-                <TouchableOpacity 
-                    style={styles.cartButton} 
-                    onPress={() => navigation.navigate('Transaction')}
+                <TouchableOpacity
+                    style={styles.cartButton}
+                    onPress={() => navigation.navigate('Cart')}
                 >
                     <Text style={styles.cartButtonText}>
-                        🛒 ({items.reduce((sum, item) => sum + item.quantity, 0)})
+                        🛒 Keranjang
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -156,12 +174,29 @@ const ProductListScreen = ({ navigation }) => {
                 keyExtractor={item => item.id.toString()}
             />
 
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('AddEditProduct')}
-            >
-                <Text style={styles.buttonText}>+ Tambah Produk</Text>
-            </TouchableOpacity>
+            <View style={styles.footerButtons}>
+                <TouchableOpacity
+                    style={[styles.button, {flex: 1, marginRight: 5}]}
+                    onPress={() => navigation.navigate('AddEditProduct')}
+                >
+                    <Text style={styles.buttonText}>+ Tambah Produk</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.button, {flex: 1, marginHorizontal: 5, backgroundColor: '#6200EE'}]}
+                    onPress={() => navigation.navigate('Dashboard')}
+                >
+                    <Text style={styles.buttonText}>📊 Dashboard</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.button, {flex: 1, marginLeft: 5, backgroundColor: '#E91E63'}]}
+                    onPress={() => navigation.navigate('ProductCatalog')}
+                >
+                    <Text style={styles.buttonText}>🛍️ Katalog</Text>
+                </TouchableOpacity>
+            </View>
+
         </View>
     );
 };
@@ -169,8 +204,8 @@ const ProductListScreen = ({ navigation }) => {
 export default ProductListScreen;
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 10 },
-    headerRow: { flexDirection: 'row', marginBottom: 10 },
+    container: {flex: 1, padding: 10},
+    headerRow: {flexDirection: 'row', marginBottom: 10},
     search: {
         borderWidth: 1,
         borderRadius: 8,
@@ -184,7 +219,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginLeft: 10,
     },
-    cartButtonText: { color: '#fff', fontWeight: 'bold' },
+    cartButtonText: {color: '#fff', fontWeight: 'bold'},
     card: {
         flexDirection: 'row',
         marginBottom: 10,
@@ -192,22 +227,27 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 10,
     },
-    image: { width: 80, height: 80, borderRadius: 8 },
-    info: { marginLeft: 10, flex: 1 },
-    name: { fontWeight: 'bold', fontSize: 16 },
+    image: {width: 80, height: 80, borderRadius: 8},
+    info: {marginLeft: 10, flex: 1},
+    name: {fontWeight: 'bold', fontSize: 16},
     button: {
         backgroundColor: 'blue',
         padding: 15,
         borderRadius: 10,
         marginTop: 10,
-        marginBottom: 40,
     },
-    buttonText: { color: '#fff', textAlign: 'center' },
+    footerButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 30,
+    },
+
+    buttonText: {color: '#fff', textAlign: 'center'},
     addToCartButton: {
         backgroundColor: '#28a745',
         padding: 8,
         borderRadius: 5,
         marginTop: 8,
     },
-    addToCartText: { color: '#fff', textAlign: 'center', fontSize: 13, fontWeight: 'bold' },
+    addToCartText: {color: '#fff', textAlign: 'center', fontSize: 13, fontWeight: 'bold'},
 });
